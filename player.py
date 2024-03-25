@@ -4,12 +4,17 @@ from constante import *
 
 class Player:
 
-    def __init__(self,sprites,pos):
+    def __init__(self,pos):
 
-        self.imgs = self.load_assets(sprites)
+        self.sprite_list = self.load_assets(STATES_PLAYER)
         self.state = "Run"
-        self.img = self.imgs[self.state]
-        self.pos = pos
+        self.sprites = self.sprite_list[self.state]
+        self.pos = self.sprites[0].get_rect(topleft=pos)
+        self.index_frame = 0
+        self.delay = SPEED_ANIMATION_FRAME
+        self.cont = 0
+        self.mask = pyg.mask.from_surface(self.sprites[0])
+        
 
 
     def load_assets(self,list_spritesheet):
@@ -33,5 +38,20 @@ class Player:
         return list_sprite
     
     def draw(self,tela):
+        self.animate_player(tela)
 
-        tela.blit(self.img[1],self.pos)
+    
+    def animate_player(self,tela):
+
+        tot_frames = len(self.sprites)
+
+        if tot_frames * self.delay <= self.index_frame:
+            self.cont = 0
+
+        self.index_frame = (int(self.cont/self.delay)) % tot_frames
+        print(self.index_frame)
+        frame_surface = self.sprites[self.index_frame]
+
+        tela.blit(frame_surface,self.pos)
+
+        self.cont += 1
